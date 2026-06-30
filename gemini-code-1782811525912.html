@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Word Form Tương Tác - Ms Lê Hằng English</title>
+    <!-- Nhúng Google Fonts hỗ trợ hiển thị tròn trịa, thân thiện chuẩn Duolingo -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- ĐỊNH NGHĨA BIẾN VÀ HỆ MÀU PASTEL + NEON GAMIFICATION --- */
+        :root {
+            --bg-gradient: linear-gradient(-45deg, #8854C0, #FECA57, #00C9A7, #FF7675, #48DBFB);
+            --correct-color: #00D26A;
+            --correct-shadow: #00A854;
+            --wrong-color: #FF4757;
+            --wrong-shadow: #D63031;
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-main: #2d3436;
+        }
+
+        /* --- CẤU HÌNH NỀN LOANG CHUYỂN ĐỘNG (ANIMATED GRADIENT) --- */
+        * {
+            box-sizing: border-box;
+            font-family: 'Nunito', 'Quicksand', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 10px 10px 40px 10px;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientMotion 16s ease infinite;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientMotion {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- LỚP LAYER HỌA TIẾT SVG TRÔI NỔI ĐỘC LẬP --- */
+        #bg-pattern-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-shape {
+            position: absolute;
+            fill: rgba(255, 255, 255, 0.15);
+            animation: floatDrift 25s linear infinite alternate;
+        }
+
+        @keyframes floatDrift {
+            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); }
+            100% { transform: translate(120px, 80px) rotate(360deg) scale(1.2); }
+        }
+
+        /* --- KHUNG GIAO DIỆN CHÍNH --- */
+        .wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 780px;
+        }
+
+        /* --- TIÊU ĐỀ BÀI HỌC VÀ KHUNG THÔNG BÁO QUAN TRỌNG --- */
+        header {
+            text-align: center;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 0px rgba(0,0,0,0.06);
+        }
+
+        header h5 {
+            margin: 0;
+            font-size: 1rem;
+            color: #6c5ce7;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+        }
+
+        .alert-box {
+            background: #fff3cd;
+            border: 3px dashed #ffc107;
+            border-radius: 16px;
+            padding: 15px;
+            margin: 15px 0 25px 0;
+            box-shadow: 0 8px 0px #ffeaa7;
+            text-align: center;
+        }
+
+        .alert-title {
+            font-weight: 900;
+            color: #d63031;
+            font-size: 1.1rem;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .alert-text {
+            font-weight: 700;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            color: #2d3436;
+        }
+
+        .scroll-reminder {
+            display: inline-block;
+            margin-top: 8px;
+            font-style: italic;
+            color: #e84393;
+            font-weight: 900;
+        }
+
+        /* --- THIẾT KẾ CARD CÂU HỎI 3D --- */
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: 0 12px 0px rgba(0, 0, 0, 0.08), 0 20px 25px rgba(0,0,0,0.05);
+            border: 3px solid #dfe6e9;
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        /* Hiệu ứng rung lắc khi trả lời sai */
+        .shake-animation {
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .q-header {
+            font-size: 1.15rem;
+            font-weight: 900;
+            color: #2c3e50;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        /* --- HỆ THỐNG ĐÁP ÁN TRẮC NGHIỆM --- */
+        .choices-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        @media (min-width: 600px) {
+            .choices-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .choice-btn {
+            background: #ffffff;
+            border: 3px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 6px 0px #e2e8f0;
+            transition: transform 0.1s ease, background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 8px 0px #cbd5e1;
+            border-color: #cbd5e1;
+        }
+
+        .choice-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0px #cbd5e1;
+        }
+
+        /* Trạng thái đúng/sai sau khi click */
+        .choice-btn.correct-ans {
+            background-color: var(--correct-color) !important;
+            color: white !important;
+            border-color: var(--correct-shadow) !important;
+            box-shadow: 0 4px 0px var(--correct-shadow) !important;
+        }
+
+        .choice-btn.wrong-ans {
+            background-color: var(--wrong-color) !important;
+            color: white !important;
+            border-color: var(--wrong-shadow) !important;
+            box-shadow: 0 4px 0px var(--wrong-shadow) !important;
+        }
+
+        .choice-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        /* --- KHUNG GIẢI THÍCH SIÊU CHI TIẾT --- */
+        .explanation-container {
+            display: none;
+            margin-top: 18px;
+            background: #f8f9fa;
+            border-left: 6px solid #6c5ce7;
+            border-radius: 0 14px 14px 0;
+            padding: 16px;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .exp-heading {
+            font-weight: 900;
+            color: #6c5ce7;
+            font-size: 1.05rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .exp-step {
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .exp-step-title {
+            font-weight: 900;
+            color: #2d3436;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* --- NÚT NỘP BÀI TỔNG KẾT --- */
+        .submit-btn-wrap {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0 50px 0;
+        }
+
+        .submit-final-btn {
+            background: linear-gradient(135deg, #ff7675, #6c5ce7);
+            color: white;
+            border: none;
+            font-size: 1.4rem;
+            font-weight: 900;
+            padding: 16px 50px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 8px 0px #4a3cb3;
+            transition: all 0.1s;
+        }
+
+        .submit-final-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 11px 0px #4a3cb3;
+        }
+
+        .submit-final-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0px #4a3cb3;
+        }
+
+        /* --- POPUP HIỂN THỊ KẾT QUẢ TỔNG HỢP --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            max-width: 500px;
+            width: 100%;
+            border-radius: 28px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            border: 4px solid #6c5ce7;
+            animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes popUp {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-score {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #6c5ce7;
+            margin: 15px 0;
+        }
+
+        .modal-comment {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.5;
+            color: #2d3436;
+            margin-bottom: 25px;
+        }
+
+        .close-modal-btn {
+            background: #00D26A;
+            color: white;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 900;
+            padding: 12px 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #00A854;
+        }
+
+        /* Canvas Pháo giấy full màn hình */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 150;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas sinh hạt pháo giấy confetti ngẫu nhiên -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Layer background chứa các họa tiết sinh động lơ lửng -->
+    <div id="bg-pattern-layer"></div>
+
+    <div class="wrapper">
+        <!-- Header Giáo viên tạo lập ngắn gọn -->
+        <header>
+            <h5>Giáo viên tạo: Ms Lê Hằng English</h5>
+        </header>
+
+        <!-- Khung nhắc nhở quan trọng bắt buộc hiển thị -->
+        <div class="alert-box">
+            <span class="alert-title">⚠️ LỜI NHẮC CỰC KỲ QUAN TRỌNG ⚠️</span>
+            <span class="alert-text">
+                Chỉ có đọc kỹ giải thích ngay sau mỗi câu, sau đó ghi lại từ vựng/cấu trúc mới vào vở để học thì mới thực sự giỏi lên.<br>
+                Làm cho xong mà không đọc giải thích hay đọc qua loa không ghi chép thì chỉ tốn thời gian vô ích!
+            </span>
+            <br>
+            <span class="scroll-reminder">* Kéo tới đâu, làm tới đó! *</span>
+        </div>
+
+        <!-- Vùng hiển thị toàn bộ nội dung đề thi được sinh động hóa từ Javascript -->
+        <div id="quiz-container"></div>
+
+        <!-- Nút nộp bài cuối trang -->
+        <div class="submit-btn-wrap">
+            <button class="submit-final-btn" onclick="submitExam()">Nộp Bài Tổng Kết</button>
+        </div>
+    </div>
+
+    <!-- Khung kết quả điểm số động viên học sinh -->
+    <div class="modal-overlay" id="result-modal">
+        <div class="modal-card">
+            <h2 style="margin:0; font-weight:900; color:#2d3436;">🎉 KẾT QUẢ CỦA CON 🎉</h2>
+            <div class="modal-score" id="score-text">0/0</div>
+            <div class="modal-comment" id="comment-text">Lời nhận xét...</div>
+            <button class="close-modal-btn" onclick="closeModal()">Làm lại bài thi</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- KHỞI TẠO ÂM THANH QUA WEB AUDIO API KHÔNG DÙNG LINK NGOÀI --- */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playAudioFeedback(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                osc.start();
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.12); 
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc.stop(audioCtx.currentTime + 0.4);
+            } else {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                osc.start();
+                osc.frequency.linearRampToValueAtTime(90, audioCtx.currentTime + 0.25);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+                osc.stop(audioCtx.currentTime + 0.35);
+            }
+        }
+
+        /* --- THUẬT TOÁN SINH PHÁO GIẤY CONFETTI --- */
+        let confettiAnimationId;
+        function triggerConfettiEffect() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+            const colors = ['#FF9FF3', '#FECA57', '#FF6B6B', '#48DBFB', '#1DD1A1', '#6c5ce7'];
+
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    r: Math.random() * 6 + 5,
+                    d: Math.random() * canvas.height,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.random() * 10 - 5,
+                    tiltAngleIncremental: Math.random() * 0.05 + 0.02,
+                    tiltAngle: 0
+                });
+            }
+
+            function drawConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let remaining = false;
+
+                particles.forEach((p) => {
+                    p.tiltAngle += p.tiltAngleIncremental;
+                    p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+                    p.x += Math.sin(p.tiltAngle);
+                    p.tilt = Math.sin(p.tiltAngle) * 12;
+
+                    if (p.y < canvas.height) { remaining = true; }
+
+                    ctx.beginPath();
+                    ctx.lineWidth = p.r;
+                    ctx.strokeStyle = p.color;
+                    ctx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+                    ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+                    ctx.stroke();
+                });
+
+                if (remaining) {
+                    confettiAnimationId = requestAnimationFrame(drawConfetti);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+            cancelAnimationFrame(confettiAnimationId);
+            drawConfetti();
+        }
+
+        /* --- TỰ ĐỘNG SINH HỌA TIẾT SVG TRÊN NỀN --- */
+        function initBackgroundPatterns() {
+            const bgLayer = document.getElementById('bg-pattern-layer');
+            const paths = [
+                "M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z",
+                "M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A2,2 0 0,1 14,6A2,2 0 0,1 12,8A2,2 0 0,1 10,6A2,2 0 0,1 12,4M6,14A2,2 0 0,1 4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14M12,20A2,2 0 0,1 10,18A2,2 0 0,1 12,16A2,2 0 0,1 14,18A2,2 0 0,1 12,20M18,14A2,2 0 0,1 16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14Z"
+            ];
+            for(let i=0; i < 20; i++) {
+                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svg.setAttribute("viewBox", "0 0 24 24");
+                svg.setAttribute("class", "floating-shape");
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                path.setAttribute("d", paths[Math.floor(Math.random() * paths.length)]);
+                svg.appendChild(path);
+                svg.style.width = Math.random() * 25 + 20 + "px";
+                svg.style.height = svg.style.width;
+                svg.style.left = Math.random() * 100 + "vw";
+                svg.style.top = Math.random() * 100 + "vh";
+                svg.style.animationDelay = Math.random() * -20 + "s";
+                svg.style.animationDuration = Math.random() * 15 + 15 + "s";
+                bgLayer.appendChild(svg);
+            }
+        }
+
+        /* --- DỮ LIỆU ĐỀ BÀI TOÀN VẸN 100% GỒM 50 CÂU WORD FORM CHUYỂN ĐỔI SANG ABCD VÀ GIẢI THÍCH 4 BƯỚC --- */
+        const quizDataRaw = [
+            {
+                heading: "Question 1: Do parents get ___________ (SATISFY) from their children’s studies?",
+                choices: ["satisfaction", "satisfying", "satisfied", "satisfactory"],
+                correct: "satisfaction",
+                explanation: {
+                    step1: "A. satisfaction (n): sự thỏa mãn, lòng hài lòng.<br>B. satisfying (adj): đem lại sự hài lòng.<br>C. satisfied (adj): cảm thấy hài lòng.<br>D. satisfactory (adj): thỏa đáng, vừa ý.",
+                    step2: "Cha mẹ có nhận được sự hài lòng từ việc học của con cái họ không?",
+                    step3: "Cấu trúc 'get + Noun' (nhận được cái gì). Sau ngoại động từ 'get' cần một danh từ làm tân ngữ phù hợp.",
+                    step4: "Loại B, C, D vì chúng là các tính từ, không đóng vai trò làm tân ngữ đứng sau động từ 'get' trong ngữ cảnh này."
+                }
+            },
+            {
+                heading: "Question 2: She sang the song ___________ (BEAUTY).",
+                choices: ["beautifully", "beautiful", "beauty", "beautify"],
+                correct: "beautifully",
+                explanation: {
+                    step1: "A. beautifully (adv): một cách hay, đẹp đẽ.<br>B. beautiful (adj): đẹp.<br>C. beauty (n): vẻ đẹp, sắc đẹp.<br>D. beautify (v): làm đẹp.",
+                    step2: "Cô ấy đã hát bài hát đó một cách rất hay.",
+                    step3: "Cần một trạng từ (adverb) đứng cuối câu để bổ nghĩa cho động từ hành động thường ở quá khứ 'sang' (hát).",
+                    step4: "Loại B (tính từ), C (danh từ), D (động từ) vì không có chức năng ngữ pháp bổ nghĩa cho động từ hành động."
+                }
+            },
+            {
+                heading: "Question 3: Could you please ___________ (INFORMATION) us about the courses and fees?",
+                choices: ["inform", "information", "informative", "informed"],
+                correct: "inform",
+                explanation: {
+                    step1: "A. inform (v): thông báo, cho biết.<br>B. information (n): thông tin.<br>C. informative (adj): chứa nhiều thông tin bổ ích.<br>D. informed (adj): có hiểu biết.",
+                    step2: "Bạn có thể vui lòng thông báo cho chúng tôi về các khóa học và học phí không?",
+                    step3: "Cấu trúc lời yêu cầu lịch sự: 'Could you please + V (nguyên thể)'. Vị trí cần một động từ nguyên mẫu.",
+                    step4: "Loại B (danh từ), C và D (tính từ) do sai hoàn toàn về mặt cấu trúc từ loại yêu cầu."
+                }
+            },
+            {
+                heading: "Question 4: She found her job ___________ (BORE).",
+                choices: ["boring", "bored", "boredom", "bore"],
+                correct: "boring",
+                explanation: {
+                    step1: "A. boring (adj): tẻ nhạt, gây chán (bản chất vật/việc).<br>B. bored (adj): cảm thấy buồn chán (cảm xúc con người).<br>C. boredom (n): sự buồn chán.<br>D. bore (v): làm cho chán.",
+                    step2: "Cô ấy nhận thấy công việc của mình thật tẻ nhạt.",
+                    step3: "Cấu trúc 'find + something + adj' (nhận thấy cái gì như thế nào). Tân ngữ 'her job' chỉ vật nên dùng tính từ đuôi -ing chỉ tính chất.",
+                    step4: "Loại B vì đuôi -ed chỉ cảm xúc người. Loại C (danh từ), D (động từ) không đúng cấu trúc ngữ pháp."
+                }
+            },
+            {
+                heading: "Question 5: That Vietnamese singer is ___________ (NATION) famous. People all over the world know her.",
+                choices: ["internationally", "nationally", "national", "international"],
+                correct: "internationally",
+                explanation: {
+                    step1: "A. internationally (adv): mang tầm quốc tế.<br>B. nationally (adv): mang tầm quốc gia.<br>C. national (adj): thuộc về quốc gia.<br>D. international (adj): thuộc về quốc tế.",
+                    step2: "Nữ ca sĩ Việt Nam đó nổi tiếng khắp thế giới. Mọi người trên toàn thế giới đều biết cô ấy.",
+                    step3: "Cần một trạng từ đứng trước tính từ 'famous' để bổ nghĩa cho nó. Vì vế sau ghi 'People all over the world know her' nên phải dùng trạng từ 'internationally'.",
+                    step4: "Loại B vì sai nghĩa ngữ cảnh thế giới. Loại C, D vì là tính từ, không đứng trước bổ nghĩa cho tính từ khác được."
+                }
+            },
+            {
+                heading: "Question 6: Mount Pinatubo in the Philippines was the world’s largest ___________ (VOLCANO) eruption in more than 50 years.",
+                choices: ["volcanic", "volcano", "volcanoes", "volcanology"],
+                correct: "volcanic",
+                explanation: {
+                    step1: "A. volcanic (adj): thuộc về núi lửa.<br>B. volcano (n): núi lửa.<br>C. volcanoes (n-số nhiều): các núi lửa.<br>D. volcanology (n): núi lửa học.",
+                    step2: "Núi Pinatubo ở Philippines là vụ phun trào núi lửa lớn nhất thế giới trong hơn 50 năm qua.",
+                    step3: "Cần điền một tính từ đứng trước để bổ nghĩa cho danh từ 'eruption' tạo thành cụm danh từ 'volcanic eruption' (vụ phun trào núi lửa).",
+                    step4: "Loại B, C, D vì đều là danh từ, không thể đóng vai trò làm tính từ đứng bổ nghĩa trực tiếp cho danh từ khác phù hợp ngữ nghĩa."
+                }
+            },
+            {
+                heading: "Question 7: I think the government should fine ___________ (HEAVY) anyone damaging green trees.",
+                choices: ["heavily", "heavy", "heaviness", "heavies"],
+                correct: "heavily",
+                explanation: {
+                    step1: "A. heavily (adv): một cách nặng nề, nghiêm khắc.<br>B. heavy (adj): nặng.<br>C. heaviness (n): sự nặng nề.<br>D. heavies (n): những người nặng ký.",
+                    step2: "Tôi nghĩ chính phủ nên phạt nặng bất cứ ai làm hỏng cây xanh.",
+                    step3: "Cần trạng từ bổ nghĩa cho động từ hành động 'fine' (phạt tiền). Cụm cố định 'fine heavily' nghĩa là phạt tiền rất nặng.",
+                    step4: "Loại B (tính từ), C và D (danh từ) vì không có chức năng đứng sau bổ nghĩa cho động từ hành động thường."
+                }
+            },
+            {
+                heading: "Question 8: The company will invest 2 million dollars to ___________ (MODERN) its factories.",
+                choices: ["modernize", "modern", "modernization", "modernity"],
+                correct: "modernize",
+                explanation: {
+                    step1: "A. modernize (v): hiện đại hóa.<br>B. modern (adj): hiện đại.<br>C. modernization (n): sự hiện đại hóa.<br>D. modernity (n): tính chất hiện đại.",
+                    step2: "Công ty sẽ đầu tư 2 triệu đô la để hiện đại hóa các nhà máy của mình.",
+                    step3: "Cấu trúc chỉ mục đích 'to + V (nguyên thể)' (để làm gì). Đứng sau cấu trúc này bắt buộc phải là động từ.",
+                    step4: "Loại B (tính từ), C và D (danh từ) vì hoàn toàn không phù hợp cấu trúc chỉ mục đích hành động."
+                }
+            },
+            {
+                heading: "Question 9: The world changed rapidly after the ___________ (INVENT) of the phone.",
+                choices: ["invention", "inventor", "invent", "inventive"],
+                correct: "invention",
+                explanation: {
+                    step1: "A. invention (n): sự phát minh, phát vật.<br>B. inventor (n): nhà phát minh (chỉ người).<br>C. invent (v): phát minh.<br>D. inventive (adj): có tài phát minh, sáng tạo.",
+                    step2: "Thế giới đã thay đổi nhanh chóng sau sự phát minh ra điện thoại.",
+                    step3: "Cấu trúc 'the + Noun + of + something'. Sau mạo từ 'the' cần một danh từ chỉ vật/sự kiện.",
+                    step4: "Loại B vì 'inventor' là danh từ chỉ người (nhà phát minh), không hợp nghĩa với đồ vật. Loại C, D sai từ loại."
+                }
+            },
+            {
+                heading: "Question 10: I hate sleeping in this bed. It’s very ___________ (COMFORT).",
+                choices: ["uncomfortable", "comfortable", "comfort", "comfortably"],
+                correct: "uncomfortable",
+                explanation: {
+                    step1: "A. uncomfortable (adj): không thoải mái, khó chịu.<br>B. comfortable (adj): thoải mái.<br>C. comfort (n/v): sự an ủi / an ủi.<br>D. comfortably (adv): một cách thoải mái.",
+                    step2: "Tôi ghét ngủ trên chiếc giường này. Nó rất không thoải mái.",
+                    step3: "Cấu trúc 'It's + very + adj'. Vế trước nói 'I hate sleeping...' (Tôi ghét ngủ) mang nghĩa tiêu cực, nên tính từ phải mang nghĩa phủ định 'uncomfortable'.",
+                    step4: "Loại B vì mang nghĩa tích cực trái ngược ngữ cảnh câu. Loại C, D sai chức năng từ loại."
+                }
+            },
+            {
+                heading: "Question 11: Mark says that sailing a boat gives him a lot of ___________ (ENJOY).",
+                choices: ["enjoyment", "enjoyable", "enjoy", "enjoyably"],
+                correct: "enjoyment",
+                explanation: {
+                    step1: "A. enjoyment (n): sự thích thú, niềm vui.<br>B. enjoyable (adj): thú vị.<br>C. enjoy (v): thích thú, tận hưởng.<br>D. enjoyably (adv): một cách thú vị.",
+                    step2: "Mark nói rằng việc chèo thuyền mang lại cho anh ấy rất nhiều niềm vui thích.",
+                    step3: "Cấu trúc định lượng 'a lot of + danh từ không đếm được/số nhiều'. Do đó cần một danh từ làm tân ngữ.",
+                    step4: "Loại B, C, D vì chúng là tính từ, động từ và trạng từ, không đứng sau cụm định lượng đứng cuối câu làm tân ngữ."
+                }
+            },
+            {
+                heading: "Question 12: This room is ___________ (LOCK). You cannot enter it.",
+                choices: ["locked", "locking", "unlock", "locker"],
+                correct: "locked",
+                explanation: {
+                    step1: "A. locked (adj/v-ed): bị khóa.<br>B. locking (v-ing): đang khóa.<br>C. unlock (v): mở khóa.<br>D. locker (n): tủ đồ có khóa.",
+                    step2: "Phòng này đã bị khóa rồi. Bạn không thể vào được đâu.",
+                    step3: "Cấu trúc câu bị động hoặc tính từ chỉ trạng thái của căn phòng: 'is + V3/ed'. Vì phòng bị khóa nên chọn 'locked'.",
+                    step4: "Loại B vì mang nghĩa chủ động tiếp diễn. Loại C là động từ nguyên mẫu. Loại D là danh từ không phù hợp cấu trúc."
+                }
+            },
+            {
+                heading: "Question 13: Steven is a ___________ (POWER) young man. He practices judo and body – building.",
+                choices: ["powerful", "powerless", "power", "powerfully"],
+                correct: "powerful",
+                explanation: {
+                    step1: "A. powerful (adj): khỏe mạnh, mạnh mẽ.<br>B. powerless (adj): bất lực, yếu đuối.<br>C. power (n): sức mạnh.<br>D. powerfully (adv): một cách mạnh mẽ.",
+                    step2: "Steven là một chàng trai trẻ khỏe mạnh. Anh ấy tập luyện judo và thể hình.",
+                    step3: "Vị trí đứng giữa mạo từ 'a' và cụm danh từ 'young man' -> Cần một tính từ bổ nghĩa. Việc tập võ và thể hình tạo nên cơ thể khỏe mạnh tích cực, chọn 'powerful'.",
+                    step4: "Loại B vì mang nghĩa tiêu cực (yếu đuối). Loại C (danh từ), D (trạng từ) không đứng trước danh từ làm bổ ngữ."
+                }
+            },
+            {
+                heading: "Question 14: Sorry about the mistakes, I ___________ (UNDERSTAND) the instruction you gave me.",
+                choices: ["misunderstood", "misunderstand", "understanding", "understandable"],
+                correct: "misunderstood",
+                explanation: {
+                    step1: "A. misunderstood (v-quá khứ): đã hiểu sai.<br>B. misunderstand (v-nguyên thể): hiểu sai.<br>C. understanding (n/adj): sự thấu hiểu / thấu hiểu.<br>D. understandable (adj): có thể hiểu được.",
+                    step2: "Xin lỗi vì những sai sót, tôi đã hiểu sai hướng dẫn mà bạn đưa cho tôi.",
+                    step3: "Câu kể về một hành động gây ra lỗi lầm hiện tại, đứng sau chủ ngữ 'I' cần động từ chia ở thì Quá khứ Đơn mang tiền tố phủ định/sai lệch là 'misunderstood'.",
+                    step4: "Loại B vì chưa chia thì quá khứ. Loại C, D vì sai từ loại (câu đang thiếu động từ chính)."
+                }
+            },
+            {
+                heading: "Question 15: It is very hard for us to understand his explanation. It is ___________ (LOGIC).",
+                choices: ["illogical", "logical", "logically", "logic"],
+                correct: "illogical",
+                explanation: {
+                    step1: "A. illogical (adj): vô lý, không logic.<br>B. logical (adj): hợp lý, logic.<br>C. logically (adv): một cách logic.<br>D. logic (n): tính logic, môn logic.",
+                    step2: "Rất khó để chúng tôi hiểu được lời giải thích của anh ấy. Nó thật vô lý.",
+                    step3: "Cấu trúc 'It is + adj'. Dựa vào ngữ cảnh vế trước 'very hard to understand' (rất khó để hiểu) chứng tỏ tính chất vô lý của lời giải thích -> chọn tính từ phủ định 'illogical'.",
+                    step4: "Le loại B vì mang nghĩa tích cực (hợp lý), trái ngược ngữ cảnh. Loại C, D sai từ loại."
+                }
+            },
+            {
+                heading: "Question 16: The whole country is trying to get rid of ___________ (POOR).",
+                choices: ["poverty", "poor", "poorly", "impoverish"],
+                correct: "poverty",
+                explanation: {
+                    step1: "A. poverty (n): sự nghèo đói.<br>B. poor (adj): nghèo khổ.<br>C. poorly (adv): một cách nghèo nàn, tồi tệ.<br>D. impoverish (v): làm cho nghèo đói.",
+                    step2: "Cả nước đang cố gắng xóa bỏ sự nghèo đói.",
+                    step3: "Cụm động từ cố định 'get rid of + Noun' (xóa bỏ, tống khứ cái gì). Vị trí sau giới từ 'of' cần điền một danh từ.",
+                    step4: "Loại B (tính từ), C (trạng từ), D (động từ) vì không đúng chức năng làm tân ngữ của giới từ."
+                }
+            },
+            {
+                heading: "Question 17: English is a ___________ (COMPARE) easy language for Swedes to learn.",
+                choices: ["comparatively", "comparative", "comparison", "compare"],
+                correct: "comparatively",
+                explanation: {
+                    step1: "A. comparatively (adv): tương đối, khá là.<br>B. comparative (adj): so sánh.<br>C. comparison (n): sự so sánh.<br>D. compare (v): so sánh.",
+                    step2: "Tiếng Anh là một ngôn ngữ tương đối dễ học đối với người Thụy Điển.",
+                    step3: "Vị trí đứng trước tính từ 'easy' bổ nghĩa cho tính từ này, do đó từ loại bắt buộc phải điền là một trạng từ (adverb).",
+                    step4: "Loại B (tính từ), C (danh từ), D (động từ) vì không có tính năng đứng bổ nghĩa trước một tính từ."
+                }
+            },
+            {
+                heading: "Question 18: One of the ___________ (LIMIT) of the Internet is personal information leaking.",
+                choices: ["limitations", "limitation", "limit", "limited"],
+                correct: "limitations",
+                explanation: {
+                    step1: "A. limitations (n-số nhiều): các mặt hạn chế.<br>B. limitation (n-số ít): sự hạn chế.<br>C. limit (n/v): giới hạn.<br>D. limited (adj): bị giới hạn.",
+                    step2: "Một trong những mặt hạn chế của Internet là việc rò rỉ thông tin cá nhân.",
+                    step3: "Cấu trúc ngữ pháp kinh điển 'One of the + Danh từ số nhiều' (Một trong những cái gì). Vì vậy phải điền danh từ số nhiều 'limitations'.",
+                    step4: "Loại B vì là danh từ số ít. Loại C, D không đúng cấu trúc ngữ pháp bắt buộc này."
+                }
+            },
+            {
+                heading: "Question 19: My teacher ___________ (COURAGE) me to take this exam.",
+                choices: ["encouraged", "encouragement", "courage", "courageous"],
+                correct: "encouraged",
+                explanation: {
+                    step1: "A. encouraged (v-quá khứ): đã khuyến khích, động viên.<br>B. encouragement (n): sự động viên.<br>C. courage (n): lòng dũng cảm.<br>D. courageous (adj): dũng cảm.",
+                    step2: "Giáo viên của tôi đã khuyến khích tôi tham gia kỳ thi này.",
+                    step3: "Câu đang thiếu một động từ chính đứng sau chủ ngữ 'My teacher'. Áp dụng cấu trúc 'encourage someone to do something' (khuyến khích ai làm gì), chia ở thì quá khứ đơn là 'encouraged'.",
+                    step4: "Loại B, C (danh từ) và D (tính từ) do các từ loại này không thể làm vị ngữ hành động chính cho câu."
+                }
+            },
+            {
+                heading: "Question 20: It was very ___________ (CARE) of you to break that coffee cup.",
+                choices: ["careless", "careful", "carefully", "carelessness"],
+                correct: "careless",
+                explanation: {
+                    step1: "A. careless (adj): bất cẩn, cẩu thả.<br>B. careful (adj): cẩn thận.<br>C. carefully (adv): một cách cẩn thận.<br>D. carelessness (n): sự bất cẩn.",
+                    step2: "Bạn thật là bất cẩn khi làm vỡ chiếc tách cà phê đó.",
+                    step3: "Cấu trúc 'It is/was + adj + of someone + to do something' (Ai đó thật như thế nào khi làm gì). Hành động làm vỡ cốc phản ánh tính từ tiêu cực 'careless'.",
+                    step4: "Loại B vì mang nghĩa cẩn thận (trái ngược thực tế làm vỡ). Loại C, D sai từ loại."
+                }
+            },
+            {
+                heading: "Question 21: ___________ (TRADITION), the Ao dai was frequently worn by both men and women.",
+                choices: ["Traditionally", "Traditional", "Tradition", "Traditions"],
+                correct: "Traditionally",
+                explanation: {
+                    step1: "A. Traditionally (adv): Theo truyền thống.<br>B. Traditional (adj): Thuộc về truyền thống.<br>C. Tradition (n-số ít): Truyền thống.<br>D. Traditions (n-số nhiều): Các truyền thống.",
+                    step2: "Theo truyền thống, Áo dài thường được mặc bởi cả nam và nữ.",
+                    step3: "Vị trí đứng ở đầu câu và được ngăn cách với mệnh đề chính bằng dấu phẩy ',' -> Cần một trạng từ (adverb) làm trạng ngữ cho cả câu.",
+                    step4: "Loại B (tính từ), C và D (danh từ) vì không thể đứng độc lập đầu câu làm thành phần trạng ngữ tách biệt bằng dấu phẩy."
+                }
+            },
+            {
+                heading: "Question 22: The Internet has ___________ (INCREASE) developed and become part of our everyday life.",
+                choices: ["increasingly", "increase", "increased", "increasing"],
+                correct: "increasingly",
+                explanation: {
+                    step1: "A. increasingly (adv): ngày càng tăng, ngày một nhiều.<br>B. increase (v/n): tăng lên / sự gia tăng.<br>C. increased (adj): được tăng lên.<br>D. increasing (adj): đang tăng lên.",
+                    step2: "Internet đã ngày càng phát triển và trở thành một phần trong cuộc sống hàng ngày của chúng ta.",
+                    step3: "Vị trí nằm giữa trợ động từ 'has' và động từ phân từ hai 'developed' -> Cần điền một trạng từ (adverb) bổ nghĩa cho động từ 'developed'.",
+                    step4: "Loại B, C, D vì không có chức năng ngữ pháp đứng giữa cấu trúc thì hoàn thành để bổ trợ cho phân từ hai."
+                }
+            },
+            {
+                heading: "Question 23: Easter is a ___________ (JOY) festival which is celebrated in many countries.",
+                choices: ["joyful", "joy", "joyfully", "joyfulness"],
+                correct: "joyful",
+                explanation: {
+                    step1: "A. joyful (adj): vui tươi, tràn ngập niềm vui.<br>B. joy (n): niềm vui.<br>C. joyfully (adv): một cách vui vẻ.<br>D. joyfulness (n): sự vui mừng.",
+                    step2: "Lễ Phục sinh là một lễ hội vui tươi được tổ chức ở nhiều quốc gia.",
+                    step3: "Vị trí nằm giữa mạo từ 'a' và danh từ 'festival' -> Cần dùng một tính từ (adjective) đứng trước bổ nghĩa tính chất cho danh từ.",
+                    step4: "Loại B, D (danh từ) và C (trạng từ) vì sai chức năng từ loại đứng bổ nghĩa trước danh từ."
+                }
+            },
+            {
+                heading: "Question 24: The baby laughed ___________ (HAPPY) as she play with her toys.",
+                choices: ["happily", "happy", "happiness", "unhappiness"],
+                correct: "happily",
+                explanation: {
+                    step1: "A. happily (adv): một cách hạnh phúc, vui vẻ.<br>B. happy (adj): hạnh phúc.<br>C. happiness (n): sự hạnh phúc.<br>D. unhappiness (n): sự bất hạnh.",
+                    step2: "Đứa bé cười một cách hạnh phúc khi chơi với đồ chơi của mình.",
+                    step3: "Cần một trạng từ (adverb) đứng sau bổ nghĩa trực tiếp cho động từ hành động diễn tả trạng thái 'laughed' (đã cười).",
+                    step4: "Loại B vì là tính từ (chỉ đi sau tobe/động từ nối). Loại C, D vì là danh từ không thể bổ nghĩa cho động từ hành động."
+                }
+            },
+            {
+                heading: "Question 25: Edison’s most famous ___________ (INVENT) was the electric bulb.",
+                choices: ["invention", "inventor", "invent", "inventive"],
+                correct: "invention",
+                explanation: {
+                    step1: "A. invention (n): sự phát minh, vật phát minh.<br>B. inventor (n): nhà phát minh (chỉ người).<br>C. invent (v): phát minh.<br>D. inventive (adj): có tài phát minh, sáng tạo.",
+                    step2: "Phát minh nổi tiếng nhất của Edison là bóng đèn điện.",
+                    step3: "Đứng sau cụm sở hữu cách và tính từ 'most famous' làm chủ ngữ chính, đi với động từ tobe số ít 'was' -> Cần danh từ chỉ vật số ít 'invention'.",
+                    step4: "Loại B vì 'inventor' là danh từ chỉ người (nhà phát minh) -> nhà phát minh không thể là bóng đèn điện. Loại C, D sai từ loại."
+                }
+            },
+            {
+                heading: "Question 26: We were disappointed because of his bad ___________ (BEHAVE).",
+                choices: ["behavior", "behave", "behavioral", "behaviorally"],
+                correct: "behavior",
+                explanation: {
+                    step1: "A. behavior (n): hành vi, cách cư xử.<br>B. behave (v): cư xử, đối xử.<br>C. behavioral (adj): thuộc về hành vi.<br>D. behaviorally (adv): về mặt hành vi.",
+                    step2: "Chúng tôi đã rất thất vọng vì cách cư xử tồi tệ của anh ấy.",
+                    step3: "Đứng sau tính từ sở hữu và tính từ 'his bad' cần một danh từ để kết hợp tạo thành một cụm danh từ hoàn chỉnh đứng sau giới từ liên hợp 'because of'.",
+                    step4: "Loại B (động từ), C (tính từ), D (trạng từ) do vi phạm cấu trúc từ loại đứng cuối cụm danh từ."
+                }
+            },
+            {
+                heading: "Question 27: There are a lot of ___________ (BEAUTY) mountains in Vietnam.",
+                choices: ["beautiful", "beauty", "beautifully", "beautify"],
+                correct: "beautiful",
+                explanation: {
+                    step1: "A. beautiful (adj): đẹp.<br>B. beauty (n): vẻ đẹp.<br>C. beautifully (adv): một cách đẹp đẽ.<br>D. beautify (v): làm đẹp.",
+                    step2: "Có rất nhiều ngọn núi đẹp ở Việt Nam.",
+                    step3: "Vị trí nằm trước danh từ số nhiều 'mountains' bổ nghĩa chỉ đặc điểm tính chất cho danh từ đó -> Cần dùng một tính từ (adjective).",
+                    step4: "Loại B (danh từ), C (trạng từ), D (động từ) vì không có chức năng ngữ pháp đứng trước danh từ làm bổ ngữ."
+                }
+            },
+            {
+                heading: "Question 28: Doctors have stressed the ___________ (NECESSARY) of eating plenty of fresh vegetables.",
+                choices: ["necessity", "necessary", "necessarily", "necessitate"],
+                correct: "necessity",
+                explanation: {
+                    step1: "A. necessity (n): sự cần thiết, tính tất yếu.<br>B. necessary (adj): cần thiết.<br>C. necessarily (adv): một cách tất yếu.<br>D. necessitate (v): bắt phải, đòi hỏi.",
+                    step2: "Các bác sĩ đã nhấn mạnh sự cần thiết của việc ăn nhiều rau xanh tươi.",
+                    step3: "Cấu trúc ngữ pháp 'the + Noun + of...'. Đứng sau mạo từ 'the' đóng vai trò làm tân ngữ trực tiếp của động từ 'stressed' -> Cần dùng danh từ.",
+                    step4: "Loại B (tính từ), C (trạng từ), D (động từ) vì các từ loại này không đứng sau mạo từ để làm danh từ trung tâm."
+                }
+            },
+            {
+                heading: "Question 29: Farmers ___________ (FERTILE) their fields with manure.",
+                choices: ["fertilize", "fertilizer", "fertile", "fertility"],
+                correct: "fertilize",
+                explanation: {
+                    step1: "A. fertilize (v): bón phân, làm cho phì nhiêu.<br>B. fertilizer (n): phân bón.<br>C. fertile (adj): phì nhiêu, màu mỡ.<br>D. fertility (n): sự màu mỡ.",
+                    step2: "Người nông dân bón phân cho ruộng đồng của họ bằng phân chuồng.",
+                    step3: "Đứng ngay sau chủ ngữ số nhiều 'Farmers' và đứng trước tân ngữ chỉ vật 'their fields' -> Cần điền một động từ chính chia ở hiện tại đơn nguyên mẫu.",
+                    step4: "Loại B, D (danh từ) và C (tính từ) do không thể thực hiện chức năng làm động từ hành động vị ngữ của câu."
+                }
+            },
+            {
+                heading: "Question 30: Do you understand the ___________ (CONDITION) sentences?",
+                choices: ["conditional", "condition", "conditionally", "conditioned"],
+                correct: "conditional",
+                explanation: {
+                    step1: "A. conditional (adj): có điều kiện.<br>B. condition (n): điều kiện.<br>C. conditionally (adv): một cách có điều kiện.<br>D. conditioned (adj): được điều hòa.",
+                    step2: "Bạn có hiểu các câu điều kiện không?",
+                    step3: "Thuật ngữ ngữ pháp cố định 'conditional sentences' có nghĩa là câu điều kiện. Vị trí cần điền tính từ 'conditional' bổ nghĩa danh từ phía sau.",
+                    step4: "Loại B (danh từ), C (trạng từ) không tạo thành thuật ngữ ngữ pháp chính xác phù hợp ngữ nghĩa."
+                }
+            },
+            {
+                heading: "Question 31: Tet holiday is the most important ___________ (CELEBRATE) for Vietnamese people.",
+                choices: ["celebration", "celebrate", "celebrated", "celebratory"],
+                correct: "celebration",
+                explanation: {
+                    step1: "A. celebration (n): ngày lễ kỷ niệm, sự ăn mừng.<br>B. celebrate (v): ăn mừng, làm lễ kỷ niệm.<br>C. celebrated (adj): nổi tiếng, lừng danh.<br>D. celebratory (adj): mang tính chất ăn mừng.",
+                    step2: "Tết là dịp lễ kỷ niệm quan trọng nhất đối với người dân Việt Nam.",
+                    step3: "Đứng sau cụm cấu trúc so sánh nhất 'the most important' đóng vai trò là một danh từ trung tâm làm thành phần vị ngữ sau động từ tobe 'is'.",
+                    step4: "Loại B (động từ), C và D (tính từ) không thích hợp làm danh từ làm chủ chốt đứng sau tính từ bổ nghĩa."
+                }
+            },
+            {
+                heading: "Question 32: We have to be ___________ (CARE) when riding our bikes on the streets.",
+                choices: ["careful", "careless", "carefully", "care"],
+                correct: "careful",
+                explanation: {
+                    step1: "A. careful (adj): cẩn thận, chú ý.<br>B. careless (adj): bất cẩn, cẩu thả.<br>C. carefully (adv): một cách cẩn thận.<br>D. care (n/v): sự chăm sóc / chăm sóc.",
+                    step2: "Chúng ta phải cẩn thận khi đi xe đạp trên đường phố.",
+                    step3: "Cấu trúc 'have to be + adj' (phải như thế nào). Hành động tham gia giao thông trên phố đòi hỏi trạng thái an toàn tích cực -> chọn tính từ 'careful'.",
+                    step4: "Loại B vì mang nghĩa phủ định nguy hiểm (bất cẩn). Loại C (trạng từ), D (danh từ/động từ) sai từ loại đứng sau động từ liên kết 'be'."
+                }
+            },
+            {
+                heading: "Question 33: The old man walked ___________ (SLOW) to the park.",
+                choices: ["slowly", "slow", "slowness", "slowed"],
+                correct: "slowly",
+                explanation: {
+                    step1: "A. slowly (adv): một cách chậm chạp.<br>B. slow (adj): chậm.<br>C. slowness (n): sự chậm chạp.<br>D. slowed (v-ed): đã làm chậm lại.",
+                    step2: "Ông cụ đi bộ một cách chậm chạp đến công viên.",
+                    step3: "Đứng sau bổ nghĩa hành động cho động từ chỉ cách thức di chuyển 'walked' -> Cần dùng một trạng từ (adverb) kết thúc bằng đuôi -ly.",
+                    step4: "Loại B (tính từ), C (danh từ), D (động từ) vì không bổ nghĩa được cho động từ hành động thường."
+                }
+            },
+            {
+                heading: "Question 34: The author's ___________ (HAPPY) is communicated through his song.",
+                choices: ["happiness", "happy", "happily", "unhappiness"],
+                correct: "happiness",
+                explanation: {
+                    step1: "A. happiness (n): sự hạnh phúc, niềm hạnh phúc.<br>B. happy (adj): hạnh phúc.<br>C. happily (adv): một cách hạnh phúc.<br>D. unhappiness (n): nỗi bất hạnh, đau khổ.",
+                    step2: "Niềm hạnh phúc của tác giả được truyền tải thông qua bài hát của ông.",
+                    step3: "Đứng sau dấu hiệu sở hữu cách 'The author's' đóng vai trò làm chủ ngữ chính của câu đứng trước cụm vị ngữ động từ 'is communicated' -> Cần một danh từ mang nghĩa tích cực là 'happiness'.",
+                    step4: "Loại B (tính từ), C (trạng từ). Loại D mang nghĩa tiêu cực (đau khổ) không đúng tinh thần bài hát tích cực."
+                }
+            },
+            {
+                heading: "Question 35: We find Huong very ___________ (COMMUNICATE).",
+                choices: ["communicative", "communication", "communicate", "communicatively"],
+                correct: "communicative",
+                explanation: {
+                    step1: "A. communicative (adj): cởi mở, giao tiếp tốt.<br>B. communication (n): sự giao tiếp, truyền thông.<br>C. communicate (v): giao tiếp.<br>D. communicatively (adv): về mặt giao tiếp.",
+                    step2: "Chúng tôi thấy Hương là người rất cởi mở và giao tiếp tốt.",
+                    step3: "Cấu trúc hệ động từ nhận thức 'find + someone + adj' (nhận thấy ai đó như thế nào). Sau trạng từ 'very' điền tính từ chỉ tính cách con người 'communicative'.",
+                    step4: "Loại B (danh từ), C (động từ), D (trạng từ) vì hoàn toàn sai cấu trúc từ loại quy định."
+                }
+            },
+            {
+                heading: "Question 36: They went to see most of the ___________ (INTEREST) places.",
+                choices: ["interesting", "interested", "interest", "interestingly"],
+                correct: "interesting",
+                explanation: {
+                    step1: "A. interesting (adj): thú vị, hấp dẫn (bản chất sự việc/vật).<br>B. interested (adj): quan tâm, thích thú (cảm xúc con người).<br>C. interest (n/v): sự thích thú / làm cho quan tâm.<br>D. interestingly (adv): một cách thú vị.",
+                    step2: "Họ đã đi xem hầu hết những địa điểm thú vị.",
+                    step3: "Đứng trước bổ nghĩa cho danh từ số nhiều chỉ vật/địa danh 'places' -> Cần dùng một tính từ chủ động mang đuôi -ing để chỉ tính chất hấp dẫn của nơi chốn.",
+                    step4: "Loại B vì tính từ đuôi -ed chỉ dùng mô tả cảm xúc của con người. Loại C, D sai từ loại."
+                }
+            },
+            {
+                heading: "Question 37: His sudden ___________ (DIE) must be a shock to her and her family.",
+                choices: ["death", "die", "dead", "deadly"],
+                correct: "death",
+                explanation: {
+                    step1: "A. death (n): cái chết, sự ra đi.<br>B. die (v): chết.<br>C. dead (adj): đã chết.<br>D. deadly (adj): chí mạng, gây chết người.",
+                    step2: "Sự ra đi đột ngột của anh ấy chắc chắn là một cú sốc lớn đối với cô ấy và gia đình.",
+                    step3: "Đứng sau tính từ sở hữu 'His' và tính từ 'sudden' đóng vai trò cấu thành cụm chủ ngữ chính đứng trước động từ khuyết thiếu 'must be' -> Cần một danh từ là 'death'.",
+                    step4: "Le loại B (động từ), C và D (tính từ) do không đáp ứng đúng vị trí cấu trúc của cụm danh từ làm chủ ngữ."
+                }
+            },
+            {
+                heading: "Question 38: The other ___________ (COMPETE) admired him.",
+                choices: ["competitors", "competition", "compete", "competitive"],
+                correct: "competitors",
+                explanation: {
+                    step1: "A. competitors (n-số nhiều): các đối thủ cạnh tranh, người thi đấu.<br>B. competition (n): cuộc cạnh tranh, kỳ thi.<br>C. compete (v): cạnh tranh, thi đấu.<br>D. competitive (adj): tính cạnh tranh.",
+                    step2: "Những người cùng thi đấu khác đều ngưỡng mộ anh ấy.",
+                    step3: "Đứng sau định từ 'The other' làm chủ ngữ thực hiện hành động 'admired' (ngưỡng mộ) -> Cần một danh từ chỉ người ở dạng số nhiều là 'competitors' (các đối thủ/người thi đấu).",
+                    step4: "Loại B danh từ chỉ sự việc. Loại C (động từ), D (tính từ) không thể làm chủ ngữ thực hiện hành động của câu."
+                }
+            },
+            {
+                heading: "Question 39: We can only get there by plane. There is no ___________ (CHOOSE).",
+                choices: ["choice", "choose", "choosy", "chosen"],
+                correct: "choice",
+                explanation: {
+                    step1: "A. choice (n): sự lựa chọn.<br>B. choose (v): chọn lựa.<br>C. choosy (adj): kén chọn.<br>D. chosen (adj): được chọn.",
+                    step2: "Chúng ta chỉ có thể đến đó bằng máy bay. Không có sự lựa chọn nào khác cả.",
+                    step3: "Cấu trúc tồn tại phủ định 'There is no + Noun' (Không có cái gì). Vị trí đứng sau từ định lượng 'no' cần điền một danh từ, danh từ của choose là 'choice'.",
+                    step4: "Loại B (động từ), C và D (tính từ) vì sai quy tắc cấu trúc từ loại đứng sau từ định lượng phủ định 'no'."
+                }
+            },
+            {
+                heading: "Question 40: Sony is a big firm which is ___________ (COMPETE) in Vietnamese's market.",
+                choices: ["competitive", "competition", "competitor", "compete"],
+                correct: "competitive",
+                explanation: {
+                    step1: "A. competitive (adj): mang tính cạnh tranh, có sức cạnh tranh lớn.<br>B. competition (n): cuộc cạnh tranh.<br>C. competitor (n): đối thủ cạnh tranh.<br>D. compete (v): cạnh tranh.",
+                    step2: "Sony là một công ty lớn có sức cạnh tranh mạnh mẽ trên thị trường Việt Nam.",
+                    step3: "Đứng sau động từ liên kết tobe 'is' làm bổ ngữ tính chất cho đại từ quan hệ thay thế vật 'which is...' -> Cần điền một tính từ phù hợp bối cảnh năng lực thị trường là 'competitive'.",
+                    step4: "Loại B, C (danh từ) và D (động từ) vì không thể đứng sau tobe làm thành phần bổ nghĩa tính chất trực tiếp của công ty."
+                }
+            },
+            {
+                heading: "Question 41: Doctors and ___________ (SCIENCE) have reported on how we are all affected by the noise around us.",
+                choices: ["scientists", "science", "scientific", "scientifically"],
+                correct: "scientists",
+                explanation: {
+                    step1: "A. scientists (n-số nhiều): các nhà khoa học.<br>B. science (n): khoa học, môn khoa học.<br>C. scientific (adj): thuộc khoa học.<br>D. scientifically (adv): về mặt khoa học.",
+                    step2: "Các bác sĩ và các nhà khoa học đã báo cáo về việc tất cả chúng ta bị ảnh hưởng như thế nào bởi tiếng ồn xung quanh.",
+                    step3: "Từ nối song hành đẳng lập 'and' liên kết giữa danh từ chỉ người số nhiều 'Doctors' -> Từ cùng loại phải là danh từ chỉ người số nhiều 'scientists' phù hợp chủ ngữ thực hiện hành động 'have reported'.",
+                    step4: "Loại B danh từ chỉ vật thể trừu tượng. Loại C, D vì sai từ loại danh từ chỉ người đối tượng hành động."
+                }
+            },
+            {
+                heading: "Question 42: The ___________ (FRIEND) between Vietnam and China is recovered.",
+                choices: ["friendship", "friend", "friendly", "friendliness"],
+                correct: "friendship",
+                explanation: {
+                    step1: "A. friendship (n): tình hữu nghị, tình bạn.<br>B. friend (n): người bạn.<br>C. friendly (adj): thân thiện.<br>D. friendliness (n): sự thân thiện.",
+                    step2: "Mối quan hệ tình hữu nghị giữa Việt Nam và Trung Quốc đã được phục hồi.",
+                    step3: "Đứng sau mạo từ xác định 'the' kết hợp cụm giới từ liên bang 'between... and...' làm chủ ngữ chính câu -> Cần danh từ khái niệm quan hệ ngoại giao là 'friendship'.",
+                    step4: "Loại B vì 'friend' chỉ một cá nhân người bạn cụ thể đơn lẻ không hợp nghĩa quốc gia. Loại C, D sai từ loại hoặc sắc thái ngữ nghĩa."
+                }
+            },
+            {
+                heading: "Question 43: The boss refused to meet the Union's ___________ (DELEGATE).",
+                choices: ["delegation", "delegate", "delegated", "delegates"],
+                correct: "delegation",
+                explanation: {
+                    step1: "A. delegation (n): phái đoàn, đoàn đại biểu.<br>B. delegate (v): ủy quyền, giao phó.<br>C. delegated (v-ed): được ủy thác.<br>D. delegates (n-số nhiều): các đại biểu cá nhân.",
+                    step2: "Ông chủ đã từ chối gặp phái đoàn đại diện của Công đoàn.",
+                    step3: "Đứng sau sở hữu cách 'the Union's' làm tân ngữ cho hành động 'meet' -> Cần một danh từ tập hợp chỉ một tổ chức phái đoàn chính thức là 'delegation'.",
+                    step4: "Loại B, C vì là động từ. Loại D tuy là danh từ nhưng chỉ các cá nhân đại biểu riêng lẻ, không phù hợp tính chất tổ chức công đoàn bằng danh từ tập hợp phái đoàn."
+                }
+            },
+            {
+                heading: "Question 44: Many ___________ (CULTURE) activities will be held tomorrow.",
+                choices: ["cultural", "culture", "cultures", "culturally"],
+                correct: "cultural",
+                explanation: {
+                    step1: "A. cultural (adj): thuộc về văn hóa.<br>B. culture (n): nền văn hóa.<br>C. cultures (n-số nhiều): các nền văn hóa.<br>D. culturally (adv): về mặt văn hóa.",
+                    step2: "Nhiều hoạt động văn hóa sẽ được tổ chức vào ngày mai.",
+                    step3: "Đứng trước danh từ số nhiều chỉ sự vật 'activities' bổ nghĩa tạo thành một cụm danh từ hoàn chỉnh -> Cần một tính từ đứng trước là 'cultural' (cultural activities - các hoạt động văn hóa).",
+                    step4: "Loại B, C vì là danh từ. Loại D vì là trạng từ không bổ nghĩa trực tiếp đứng trước danh từ."
+                }
+            },
+            {
+                heading: "Question 45: She ___________ (REASON) with me for an hour about the future job yesterday.",
+                choices: ["reasoned", "reason", "reasonable", "reasonably"],
+                correct: "reasoned",
+                explanation: {
+                    step1: "A. reasoned (v-quá khứ): đã lập luận, tranh luận phân tích.<br>B. reason (v/n): lập luận / lý do.<br>C. reasonable (adj): hợp lý.<br>D. reasonably (adv): một cách hợp lý.",
+                    step2: "Cô ấy đã lập luận tranh luận với tôi suốt một tiếng đồng hồ về công việc tương lai vào ngày hôm qua.",
+                    step3: "Câu có trạng từ chỉ thời gian quá khứ rõ rệt 'yesterday' và đứng ngay sau chủ ngữ 'She' -> Cần một động từ chính chia ở thì Quá khứ Đơn (V-ed). Cụm 'reason with someone' nghĩa là tranh luận làm rõ lý lẽ với ai.",
+                    step4: "Loại B vì chưa chia thì quá khứ. Loại C, D do sai chức năng từ loại yêu cầu của câu."
+                }
+            },
+            {
+                heading: "Question 46: The ___________ (ATTRACT) of the moon for the earth causes the tides.",
+                choices: ["attraction", "attractive", "attract", "attractively"],
+                correct: "attraction",
+                explanation: {
+                    step1: "A. attraction (n): lực hút, sức hút vật lý.<br>B. attractive (adj): cuốn hút, lôi cuốn.<br>C. attract (v): thu hút.<br>D. attractively (adv): một cách cuốn hút.",
+                    step2: "Lực hút của Mặt Trăng đối với Trái Đất là nguyên nhân gây ra hiện tượng thủy triều.",
+                    step3: "Nằm trong cấu trúc danh từ 'The + Noun + of...' đóng vai trò làm thành phần chủ ngữ chính đứng trước động từ số ít 'causes' -> Cần điền một danh từ hiện tượng vật lý là 'attraction'.",
+                    step4: "Loại B (tính từ), C (động từ), D (trạng từ) vì sai chức năng từ loại cấu thành chủ ngữ đứng sau mạo từ 'the'."
+                }
+            },
+            {
+                heading: "Question 47: Our team played ___________ (SUCCESS). We lost.",
+                choices: ["unsuccessfully", "successfully", "success", "unsuccessful"],
+                correct: "unsuccessfully",
+                explanation: {
+                    step1: "A. unsuccessfully (adv): một cách thất bại, không thành công.<br>B. successfully (adv): một cách thành công.<br>C. success (n): sự thành công.<br>D. unsuccessful (adj): không thành công.",
+                    step2: "Đội của chúng tôi đã thi đấu một cách không thành công. Chúng tôi đã thua cuộc.",
+                    step3: "Cần một trạng từ (adv) bổ nghĩa cho động từ hành động thường 'played'. Kết hợp dữ liệu vế sau 'We lost' (Chúng tôi đã thua) -> trạng từ phải mang tiền tố trái ngược phủ định là 'unsuccessfully'.",
+                    step4: "Loại B vì mâu thuẫn hoàn toàn với kết quả thua trận vế sau. Loại C, D vì sai cấu trúc từ loại."
+                }
+            },
+            {
+                heading: "Question 48: It is said that Hue is a ___________ (PEACE) city.",
+                choices: ["peaceful", "peace", "peacefully", "peacemaker"],
+                correct: "peaceful",
+                explanation: {
+                    step1: "A. peaceful (adj): thanh bình, yên bình.<br>B. peace (n): hòa bình, sự bình yên.<br>C. peacefully (adv): một cách thanh bình.<br>D. peacemaker (n): người hòa giải.",
+                    step2: "Người ta nói rằng Huế là một thành phố thanh bình.",
+                    step3: "Đứng giữa mạo từ 'a' và danh từ số ít chỉ nơi chốn 'city' tạo cụm danh từ hoàn chỉnh -> Cần một tính từ đứng trước bổ nghĩa tính chất đặc điểm là 'peaceful'.",
+                    step4: "Loại B, D (danh từ) và C (trạng từ) vì sai cấu trúc vị trí từ loại quy định đứng trước bổ nghĩa cho danh từ."
+                }
+            },
+            {
+                heading: "Question 49: He came first in the ___________ (COMPETE).",
+                choices: ["competition", "competitor", "compete", "competitive"],
+                correct: "competition",
+                explanation: {
+                    step1: "A. competition (n): cuộc thi, cuộc thi đấu.<br>B. competitor (n): đối thủ cạnh tranh.<br>C. compete (v): cạnh tranh, thi đấu.<br>D. competitive (adj): mang tính cạnh tranh.",
+                    step2: "Anh ấy đã giành vị trí đứng đầu trong cuộc thi đấu.",
+                    step3: "Đứng sau mạo từ chỉ định 'the' đóng vai trò làm tân ngữ giới từ cụm 'in the...' -> Cần điền một danh từ chỉ sự kiện giải đấu là 'competition'.",
+                    step4: "Loại B vì 'competitor' chỉ cá nhân con người (đối thủ) -> không thể nói đứng đầu trong một người đối thủ. Loại C, D sai từ loại."
+                }
+            },
+            {
+                heading: "Question 50: Good ___________ (PREPARE) were the keys to the success of the 23th Sea Games.",
+                choices: ["preparations", "preparation", "prepare", "preparatory"],
+                correct: "preparations",
+                explanation: {
+                    step1: "A. preparations (n-số nhiều): các công tác chuẩn bị, sự chuẩn bị.<br>B. preparation (n-số ít): sự chuẩn bị.<br>C. prepare (v): chuẩn bị.<br>D. preparatory (adj): mang tính sửa soạn.",
+                    step2: "Những sự chuẩn bị tốt chính là chìa khóa đem lại sự thành công rực rỡ của kỳ Đại hội Thể thao Sea Games lần thứ 23.",
+                    step3: "Đứng trước động từ tobe số nhiều chia ở quá khứ 'were' đóng vai trò làm chủ ngữ chính cho câu -> Cần dùng một danh từ đếm được chia ở dạng số nhiều 'preparations'.",
+                    step4: "Loại B vì là danh từ số ít (nếu dùng phải đi với tobe 'was'). Loại C (động từ) và D (tính từ) hoàn toàn sai cấu trúc ngữ pháp."
+                }
+            }
+        ];
+
+        /* --- THUẬT TOÁN SHUFFLE NGẪU NHIÊN ĐÁP ÁN MỖI LẦN LOAD TRANG --- */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Nhân bản sâu và xáo trộn đáp án của từng câu riêng biệt để đảm bảo tính khách quan
+        const quizData = quizDataRaw.map((q) => {
+            const choicesCopy = [...q.choices];
+            shuffleArray(choicesCopy);
+            return { ...q, choices: choicesCopy };
+        });
+
+        // Đối tượng lưu trữ tiến trình làm bài của học sinh
+        let userProgress = {};
+
+        /* --- HÀM RENDER ĐỀ THI LÊN WEB --- */
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = "";
+
+            quizData.forEach((q, qIdx) => {
+                const card = document.createElement('div');
+                card.className = "question-card";
+                card.id = `card-q-${qIdx}`;
+
+                // Tiêu đề câu hỏi
+                const headerDiv = document.createElement('div');
+                headerDiv.className = "q-header";
+                headerDiv.innerHTML = q.heading;
+                card.appendChild(headerDiv);
+
+                // Lưới chứa 4 đáp án trắc nghiệm ABCD
+                const choicesGrid = document.createElement('div');
+                choicesGrid.className = "choices-grid";
+
+                q.choices.forEach((choiceText) => {
+                    const btn = document.createElement('button');
+                    btn.className = "choice-btn";
+                    btn.innerHTML = choiceText;
+                    btn.onclick = () => checkChoiceAnswer(qIdx, choiceText, btn, q.correct, card);
+                    choicesGrid.appendChild(btn);
+                });
+                card.appendChild(choicesGrid);
+
+                // Khung giải thích ẩn sẵn bên dưới mỗi thẻ bài tập
+                const expDiv = document.createElement('div');
+                expDiv.className = "explanation-container";
+                expDiv.id = `explanation-${qIdx}`;
+                expDiv.innerHTML = `
+                    <div class="exp-heading">💡 GIẢI THÍCH CHI TIẾT TỪ MS LÊ HẰNG</div>
+                    <div class="exp-step">
+                        <span class="exp-step-title">Bước 1: Phân tích từ vựng 4 đáp án:</span>
+                        <div>${q.explanation.step1}</div>
+                    </div>
+                    <div class="exp-step">
+                        <span class="exp-step-title">Bước 2: Dịch nghĩa toàn câu:</span>
+                        <div style="font-style: italic; color: #555;">"${q.explanation.step2}"</div>
+                    </div>
+                    <div class="exp-step">
+                        <span class="exp-step-title">Bước 3: Tại sao chọn đáp án này?</span>
+                        <div style="color: var(--correct-shadow); font-weight:700;">${q.explanation.step3}</div>
+                    </div>
+                    <div class="exp-step">
+                        <span class="exp-step-title">Bước 4: Tại sao 3 đáp án còn lại SAI?</span>
+                        <div>${q.explanation.step4}</div>
+                    </div>
+                `;
+                card.appendChild(expDiv);
+                container.appendChild(card);
+            });
+        }
+
+        /* --- XỬ LÝ CHECK ĐÁP ÁN TRẮC NGHIỆM TỨC THÌ --- */
+        function checkChoiceAnswer(qIdx, selectedText, clickedBtn, correctText, cardDOM) {
+            const isCorrect = (selectedText === correctText);
+            const parentGrid = clickedBtn.parentElement;
+            const allButtons = parentGrid.querySelectorAll('.choice-btn');
+
+            // Khóa tất cả các nút bấm trong câu này sau khi đã lựa chọn
+            allButtons.forEach(btn => btn.disabled = true);
+
+            if (isCorrect) {
+                clickedBtn.classList.add('correct-ans');
+                playAudioFeedback('correct');
+                triggerConfettiEffect();
+                userProgress[`q-${qIdx}`] = true;
+            } else {
+                clickedBtn.classList.add('wrong-ans');
+                // Hiển thị bổ sung màu xanh cho đáp án đúng để học sinh đối chiếu đối lập tức thì
+                allButtons.forEach(btn => {
+                    if (btn.innerText === correctText) {
+                        btn.classList.add('correct-ans');
+                    }
+                });
+                playAudioFeedback('wrong');
+                cardDOM.classList.add('shake-animation'); // Rung lắc thẻ bài tập khi làm sai
+                userProgress[`q-${qIdx}`] = false;
+            }
+
+            // Tự động bung khung hiển thị giải thích siêu chi tiết ngay lập tức dưới câu hỏi
+            document.getElementById(`explanation-${qIdx}`).style.display = "block";
+        }
+
+        /* --- HÀM TÍNH TOÁN VÀ NỘP BÀI TỔNG KẾT --- */
+        function submitExam() {
+            let totalQuestions = quizData.length;
+            let correctCount = 0;
+
+            for (let i = 0; i < totalQuestions; i++) {
+                if (userProgress[`q-${i}`] === true) {
+                    correctCount++;
+                }
+            }
+
+            const scorePercentage = (correctCount / totalQuestions) * 100;
+            let commentText = "";
+
+            // Phân loại phân khúc điểm số hiển thị lời nhận xét động viên
+            if (scorePercentage < 50) {
+                commentText = "Điểm lần này chưa cao lắm, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+            } else if (scorePercentage >= 60 && scorePercentage <= 80) {
+                commentText = "Con đã có tiến bộ khá ổn rồi, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+            } else if (scorePercentage >= 90) {
+                commentText = "Làm tốt lắm, con cố gắng ring điểm 10 ở lần sau nha!";
+            } else {
+                commentText = "Con làm bài khá tốt! Hãy đọc lại các câu sai thông qua bảng giải thích chi tiết của cô để tích lũy thêm kiến thức vững vàng nhé!";
+            }
+
+            document.getElementById('score-text').innerText = `${correctCount} / ${totalQuestions}`;
+            document.getElementById('comment-text').innerText = commentText;
+            document.getElementById('result-modal').style.display = "flex";
+        }
+
+        /* --- RESET LÀM LẠI BÀI THI MỚI --- */
+        function closeModal() {
+            document.getElementById('result-modal').style.display = "none";
+            userProgress = {}; 
+            // Xáo trộn ngẫu nhiên lại thứ tự câu hỏi để học sinh ôn tập lại
+            shuffleArray(quizData);
+            renderQuiz();
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        /* --- KHỞI CHẠY HỆ THỐNG --- */
+        window.onload = () => {
+            initBackgroundPatterns();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>
